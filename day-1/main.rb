@@ -2,25 +2,20 @@
 
 require "byebug"
 require "active_support/all"
-content = File.read("example.txt")
-# content = File.read("input.txt")
+require 'io/console'                                                                                                       
+
+content = File.read("input.txt")
+
+digits = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 
 total = 0
+file_data = ""
 
 content.split("\n").each do |line|
-  digits = line.gsub(/[^0-9]/, '') 
-  first = digits[0]
-  last = digits[digits.length - 1]
-  total += (first + last).to_i
+  replaced = line
+  digits.each_with_index { |num, i| replaced = replaced.gsub(num, num + i.to_s + num) }
+  d = replaced.scan(/\d/)
+  total += (d[0] + d[d.length - 1]).to_i
 end
 
 puts total
-
-# single = content.split("\n").first
-# single = single.gsub(/[^0-9]/, '')
-# puts single
-# puts single[0]
-
-# puts (single[0] + single[single.length - 1]).to_i
-
-# puts content
