@@ -44,10 +44,19 @@ class Solution
     end
 
     def pt2
+      powers = @games.map do |game|
+        min_red = game[:sets].map {|s| s["red"]}.compact.max
+        min_blue = game[:sets].map {|s| s["blue"]}.compact.max
+        min_green = game[:sets].map {|s| s["green"]}.compact.max
+
+        min_red * min_blue * min_green
+      end
+
+      puts powers.sum
     end
 end
 
 filename = "input.txt"
 # filename = "sample.txt"
-puts Solution.new(filename, {}).pt1
+# puts Solution.new(filename, {}).pt1
 puts Solution.new(filename, {}).pt2
