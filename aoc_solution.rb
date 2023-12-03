@@ -5,6 +5,19 @@ class AOCSolution
     parse_data
   end
 
+  def numeric?(val)
+    val.match?(/\A\d+\z/)
+  end
+
+  def within_bounds?(2darr, r,c)
+    return false if r < 0
+    return false if c < 0
+    return false if r >= 2darr.size
+    return false if c >= 2darr[0].size
+
+    return true
+  end
+
   def extract_digits(str, single_digit: false, exclude_negative: false)
     regex = if single_digit && exclude_negative
               /\d/
