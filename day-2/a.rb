@@ -20,10 +20,7 @@ class Day < AOCSolution
         s
       end
 
-      {
-        id: id,
-        sets: sets
-      }
+      { id: id, sets: sets }
     end
   end
 
