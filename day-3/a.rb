@@ -7,6 +7,8 @@ require_relative "../aoc_solution"
 class Day < AOCSolution
   def parse_data
     @grid = @data.split("\n").map {|l| l.split("") }
+    @original_grid = @data.split("\n").map {|l| l.split("") }
+    @islands = []
   end
 
   def numeric?(val)
@@ -54,7 +56,88 @@ class Day < AOCSolution
     @sum
   end
 
+  def sum_island(island)
+    rows_hash = island.group_by {|r,c| r}.transform_values {|v| v.sort }
+    units = []
+
+    rows_hash.each do |k, v|
+      unit = []
+      counter = nil
+      v.each_with_index do |coords,i|
+        r,c = coords
+        if counter.nil?
+          unit << [r,c]
+          counter = c
+        elsif counter == c - 1
+          unit << [r,c]
+          counter = c
+        else
+          units << unit
+          unit = [[r,c]]
+          counter = c
+        end
+
+        if i == v.length - 1
+          units << unit
+        end
+      end
+    end
+
+    units = units.map {|u| u.map {|r,c| @original_grid[r][c] }}
+
+    engine_nums = units.map(&:join).map do |val|
+      numeric?(val) ? val : val.split(/\D/).reject(&:empty?)
+    end.flatten.map(&:to_i)
+
+    engine_nums
+  end
+
+  def bfs(row, column)
+    queue = [[row, column]]
+    island = []
+
+    while !queue.empty?
+      r, c = queue.pop
+      if @grid[r][c] != "."
+
+        island << [r, c]
+
+        @grid[r][c] = "."
+
+        queue << [r + 1, c] if (r + 1 < @grid.size && @grid[r + 1][c] != ".") # down
+        queue << [r - 1, c] if (r - 1 >= 0 && @grid[r - 1][c] != ".") # up
+
+        queue << [r, c + 1] if (c + 1 < @grid[0].size && @grid[r][c + 1] != ".") # right
+        queue << [r, c - 1] if (c - 1 >= 0 && @grid[r][c - 1] != ".") # left
+
+        queue << [r + 1, c + 1] if (r + 1 < @grid.size && c + 1 < @grid[0].size && @grid[r + 1][c + 1] != ".") # down-right
+        queue << [r + 1, c - 1] if (r + 1 < @grid.size && c - 1 >= 0 && @grid[r + 1][c - 1] != ".") # down-left
+
+        queue << [r - 1, c + 1] if (r - 1 >= 0 && c + 1 < @grid[0].size && @grid[r - 1][c + 1] != ".") # up-right
+        queue << [r - 1, c - 1] if (r - 1 >= 0 && c -1 >= 0 && @grid[r - 1][c - 1] != ".") # up-left
+      end
+    end
+
+    island
+  end
+
   def pt2
+    @grid.each_with_index do |row, r|
+      row.each_with_index do |val, c|
+        next if val == "."
+
+        @islands.push(bfs(r, c))
+      end
+    end
+
+    @islands.reject! do |isl|
+      isl.all? do |r, c|
+        numeric?(@original_grid[r][c])
+      end
+    end
+
+    e = @islands.map {|i| sum_island(i) }
+    e.reject {|e| e.length != 2 }.map {|a,b| a*b }.sum
   end
 end
 
