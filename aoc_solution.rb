@@ -5,15 +5,18 @@ class AOCSolution
     parse_data
   end
 
+  def parse_data
+  end
+
   def numeric?(val)
     val.match?(/\A\d+\z/)
   end
 
-  def within_bounds?(2darr, r,c)
+  def within_bounds?(twodarr, r,c)
     return false if r < 0
     return false if c < 0
-    return false if r >= 2darr.size
-    return false if c >= 2darr[0].size
+    return false if r >= twodarr.size
+    return false if c >= twodarr[0].size
 
     return true
   end
