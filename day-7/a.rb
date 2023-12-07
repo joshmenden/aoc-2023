@@ -7,12 +7,12 @@ require_relative "../aoc_solution"
 class Day < AOCSolution
 
   def hand_type(hand)
-    h = hand.split("")
+    h = hand.split("").sort
     return 7 if h.uniq.length == 1
-    return 6 if h.uniq.length == 2
-    return 5 if (h.sort.first(2).uniq.length == 1 && h.sort.last(3).uniq.length == 1) || (h.sort.first(3).uniq.length == 1 && h.sort.last(2).uniq.length == 1)
-    return 4 if h.uniq.length == 3 && (h.sort.first(3).uniq.length == 1 || h.sort.last(3).uniq.length == 1 || h.sort[1..3].uniq.length == 1)
-    return 3 if h.uniq.length == 3
+    return 6 if h.uniq.length == 2 && (h.first(4).uniq.length == 1 || h.last(4).uniq.length == 1)
+    return 5 if (h.first(2).uniq.length == 1 && h.last(3).uniq.length == 1) || (h.first(3).uniq.length == 1 && h.last(2).uniq.length == 1)
+    return 4 if h.uniq.length == 3 && (h.first(3).uniq.length == 1 || h.last(3).uniq.length == 1 || h[1..3].uniq.length == 1)
+    return 3 if h.uniq.length == 3 # ?
     return 2 if h.uniq.length == 4
     return 1 if h.uniq.length == 5
   end
@@ -34,8 +34,15 @@ class Day < AOCSolution
   def pt1
     @data.scan(/(.*) (\d+)/)
       .map {|h,b| [h, b.to_i]}
-      .sort { |a, b| hand_type(a[0]) < hand_type(b[0]) ? -1 : hand_type(a[0]) > hand_type(b[0]) ? 1 : hand_strength(a, b) }
-      .each_with_index.reduce(0) {|acc, ((h, b), i)| acc + (b.to_i * (i+1)) }
+      .sort do |ha, hb|
+        if hand_type(ha[0]) < hand_type(hb[0])
+          -1
+        elsif hand_type(ha[0]) > hand_type(hb[0])
+          1
+        else
+          hand_strength(ha, hb)
+        end
+      end.each_with_index.reduce(0) {|acc, ((h, b), i)| acc + (b.to_i * (i+1)) }
   end
 
   def pt2
@@ -44,4 +51,5 @@ end
 
 filename = "sample.txt"
 filename = "input.txt"
+# filename = "test.txt"
 Day.new(filename).solve!
