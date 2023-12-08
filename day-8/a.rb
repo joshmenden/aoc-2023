@@ -5,78 +5,31 @@ require "active_support/all"
 require_relative "../aoc_solution"
 
 class Day < AOCSolution
-  class Node
-    attr_accessor :val, :left, :right
-
-    def initialize(val, left = nil, right = nil)
-      @val = val
-      @left = left
-      @right = right
-    end
-  end
-
-  class Tree
-    attr_accessor :root
-
-    def initialize(root = nil)
-      @root = root
-    end
-  end
-
   def parse_data
     @data = @data.split("\n\n")
     @dirs = @data.shift.split("")
     @node_data = @data.pop.scan(/(.*) = \((.*), (.*)\)/)
-    @start = "AAA"
-    @end = "ZZZ"
   end
 
-  def build_tree(root_node, nodes)
-    root_i = @node_data.index {|rt,l,r| rt == root_node.val }
-    return root_node if root_i.nil?
+  def steps_to_end(graph, end_proc)
+    curr = graph.root
 
-    rt, l, r = @node_data[root_i]
-
-    if nodes.key?(l)
-      root_node.left = nodes[l]
-    else
-      nodes[l] = Node.new(l)
-      root_node.left = build_tree(nodes[l], nodes)
-    end
-
-    if nodes.key?(r)
-      root_node.right = nodes[r]
-    else
-      nodes[r] = Node.new(r)
-      root_node.right = build_tree(nodes[r], nodes)
-    end
-
-    return root_node
-  end
-
-  def steps_to_end(tree, start, end_proc)
-    curr = tree.root
-
-    i = 0
-    loop do
-      dir = @dirs[i % @dirs.length]
+    @dirs.cycle.with_index do |dir, i|
       curr = dir == "L" ? curr.left : curr.right
-
-      i += 1
-      break if curr.val == end_proc.call
+      return i + 1 if end_proc.call(curr.val)
     end
-
-    i
   end
 
   def pt1
-    nodes = {@start => Node.new(@start)}
-    tree = Tree.new(build_tree(nodes[@start], nodes))
-
-    steps_to_end(tree, @start, -> { "ZZZ" })
+    steps_to_end(Graph.new(Node.new("AAA"), @node_data), ->(val) { val == "ZZZ" })
   end
 
   def pt2
+    @node_data
+      .select {|rt, _l, _r| rt.end_with?("A") }
+      .map {|rt, _l, _r| Graph.new(Node.new(rt), @node_data)}
+      .map {|g| steps_to_end(g, ->(val) { val.end_with?("Z") }) }
+      .reduce(1) { |lcm, num| lcm.lcm(num) }
   end
 end
 

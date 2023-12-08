@@ -5,6 +5,39 @@ class AOCSolution
     parse_data
   end
 
+  class Node
+    attr_accessor :val, :left, :right
+
+    def initialize(val, left = nil, right = nil)
+      @val = val
+      @left = left
+      @right = right
+    end
+  end
+
+  class Graph
+    attr_accessor :root
+
+    def initialize(root = nil, raw_data = nil)
+      @root = root
+      @raw_data = raw_data # [[root, left, right], [root, left, right], ...etc]
+      Graph.build!(@root, {}, @raw_data)
+    end
+
+    def self.build!(root, nodes, raw_data)
+      nodes[root.val] = root
+
+      root_i = raw_data.index {|rt,l,r| rt == root.val }
+      return root if root_i.nil?
+
+      rt, l, r = raw_data[root_i]
+      root.left = nodes.key?(l) ? root.left = nodes[l] : root.left = Graph.build!(Node.new(l), nodes, raw_data)
+      root.right = nodes.key?(r) ? root.right = nodes[r] : root.right = Graph.build!(Node.new(r), nodes, raw_data)
+
+      return root
+    end
+  end
+
   def numeric?(val)
     val.match?(/\A\d+\z/)
   end
