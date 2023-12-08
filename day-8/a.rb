@@ -31,44 +31,49 @@ class Day < AOCSolution
     @end = "ZZZ"
   end
 
-  def build_tree(root_node)
+  def build_tree(root_node, nodes)
     root_i = @node_data.index {|rt,l,r| rt == root_node.val }
     return root_node if root_i.nil?
 
     rt, l, r = @node_data[root_i]
 
-    if @nodes.key?(l)
-      root_node.left = @nodes[l]
+    if nodes.key?(l)
+      root_node.left = nodes[l]
     else
-      @nodes[l] = Node.new(l)
-      root_node.left = build_tree(@nodes[l])
+      nodes[l] = Node.new(l)
+      root_node.left = build_tree(nodes[l], nodes)
     end
 
-    if @nodes.key?(r)
-      root_node.right = @nodes[r]
+    if nodes.key?(r)
+      root_node.right = nodes[r]
     else
-      @nodes[r] = Node.new(r)
-      root_node.right = build_tree(@nodes[r])
+      nodes[r] = Node.new(r)
+      root_node.right = build_tree(nodes[r], nodes)
     end
 
     return root_node
   end
 
-  def pt1
-    @nodes = {@start => Node.new(@start)}
-    tree = Tree.new(build_tree(@nodes[@start]))
+  def steps_to_end(tree, start, end_proc)
     curr = tree.root
 
     i = 0
     loop do
       dir = @dirs[i % @dirs.length]
       curr = dir == "L" ? curr.left : curr.right
-      
+
       i += 1
-      break if curr.val == @end
+      break if curr.val == end_proc.call
     end
 
     i
+  end
+
+  def pt1
+    nodes = {@start => Node.new(@start)}
+    tree = Tree.new(build_tree(nodes[@start], nodes))
+
+    steps_to_end(tree, @start, -> { "ZZZ" })
   end
 
   def pt2
