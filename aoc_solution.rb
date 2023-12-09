@@ -5,6 +5,13 @@ class AOCSolution
     parse_data
   end
 
+  def numeric?(val)
+    val.match?(/\A\d+\z/)
+  end
+
+  def parse_data
+  end
+
   class Node
     attr_accessor :val, :left, :right
 
@@ -36,13 +43,6 @@ class AOCSolution
 
       return root
     end
-  end
-
-  def numeric?(val)
-    val.match?(/\A\d+\z/)
-  end
-
-  def parse_data
   end
 
   def within_bounds?(twod_arr, r,c)
