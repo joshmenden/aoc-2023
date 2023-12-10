@@ -12,6 +12,10 @@ class AOCSolution
   def parse_data
   end
 
+  def twod_arr(input)
+    input.split("\n").map {|l| l.split("") }
+  end
+
   class Node
     attr_accessor :val, :left, :right
 
