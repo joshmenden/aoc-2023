@@ -85,7 +85,6 @@ class AOCSolution
       pt2_solution = pt2
     end
 
-
     puts "Part 2 Solution: #{pt2_solution} (#{pt2_time.round(1)}s)"
   end
 end
