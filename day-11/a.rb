@@ -32,7 +32,46 @@ class Day < AOCSolution
     galaxies
   end
 
-  def relevant_children(pos)
+  def relevant_children(pos, goal)
+    children = []
+    r, c = pos
+    gr, gc = goal
+
+    directions = []
+    if gr >= r
+      directions << :down
+    elsif gr < r
+      directions << :up
+    end
+
+    if gc >= c
+      directions << :right
+    elsif gc < c
+      directions << :left
+    end
+
+    case directions
+    when [:down, :right]
+      return [
+        [r + 1, c],
+        [r, c + 1],
+      ]
+    when [:down, :left]
+      return [
+        [r + 1, c],
+        [r, c - 1],
+      ]
+    when [:up, :right]
+      return [
+        [r - 1, c],
+        [r, c + 1],
+      ]
+    when [:up, :left]
+      return [
+        [r - 1, c],
+        [r, c - 1],
+      ]
+    end
   end
 
   def shortest_path(cosmos, combo)
@@ -46,23 +85,10 @@ class Day < AOCSolution
       pos = path.last
 
       if pos == goal
-        # require "byebug"; byebug;
-        # @shortest_paths[[start, goal]] = path
         return path
       end
 
-      # if @shortest_paths.key?([pos, goal])
-      #   require "byebug"; byebug;
-      # end
-
-      r, c = pos
-
-      [
-        [r, c + 1],
-        [r, c - 1],
-        [r + 1, c],
-        [r - 1, c],
-      ].each do |new_pos|
+      relevant_children(pos, goal).each do |new_pos|
         # require "byebug"; byebug;
         next if visited.include?(new_pos)
         next if !within_bounds?(cosmos, new_pos[0], new_pos[1])
@@ -76,7 +102,6 @@ class Day < AOCSolution
   end
 
   def pt1
-    @shortest_paths = {}
     cosmos = expand 
     galaxies = find_galaxies(cosmos)
     combinations = galaxies.combination(2).to_a
@@ -93,5 +118,5 @@ class Day < AOCSolution
 end
 
 filename = "sample.txt"
-# filename = "input.txt"
+filename = "input.txt"
 Day.new(filename).solve!
