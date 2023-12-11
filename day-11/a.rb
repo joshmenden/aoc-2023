@@ -81,7 +81,6 @@ class Day < AOCSolution
     visited.add(start)
 
     while !queue.empty?
-      # require "byebug"; byebug;
       path = queue.shift
       pos = path.last
 
@@ -92,7 +91,8 @@ class Day < AOCSolution
       end
 
       if @shortest_paths.key?([pos, goal])
-        shortest = path.dup.concat(@shortest_paths[[pos, goal]].dup)
+        # require "byebug"; byebug;
+        shortest = path.dup.concat(@shortest_paths[[pos, goal]].dup).uniq
         @shortest_paths[[start, goal]] = shortest
         @shortest_paths[[goal, start]] = shortest
 
