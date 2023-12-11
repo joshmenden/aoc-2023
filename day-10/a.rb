@@ -51,7 +51,6 @@ class Day < AOCSolution
     r1, c1 = curr
     r2, c2 = cand
 
-    # require "byebug"; byebug;
     !@loop.include?(cand) && within_bounds?(@data, r2, c2) && pipes_connect?(@data[r1][c1], @data[r2][c2], dir)
   end
 
@@ -80,11 +79,40 @@ class Day < AOCSolution
     @loop
   end
 
+  def inside_loop?(r, c)
+    # https://en.wikipedia.org/wiki/Even–odd_rule
+    # even crossings = outside loop
+    # odd crossings = inside loop
+    # I started going straight right but being colinear with lines
+    # creates some weirdness, which you can avoid by going diagonal instead
+    # I'm going to go down and right
+  
+    crossings = 0
+    while c < @data[0].size && r < @data.size
+      c += 1
+      r += 1
+      if @loop.include?([r, c]) && @data[r][c] != "7" && @data[r][c] != "L"
+        crossings += 1
+      end
+    end
+
+    crossings % 2 != 0
+  end
+
   def pt2
+    insides = []
+    @data.each_with_index do |r, r_ind|
+      r.each_with_index do |c, c_ind|
+        next if @loop.include?([r_ind, c_ind])
+        insides << [r_ind, c_ind] if inside_loop?(r_ind, c_ind)
+      end
+    end
+
+    insides.count
   end
 end
 
-filename = "sample.txt"
-filename = "sample2.txt"
+# Part 1 Solution in (30.9s)
+# Part 2 Solution in (227.7s)
 filename = "input.txt"
 Day.new(filename).solve!
