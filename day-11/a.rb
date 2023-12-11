@@ -77,7 +77,8 @@ class Day < AOCSolution
   def shortest_path(cosmos, combo)
     start, goal = combo
     queue = [[start]]
-    visited = [start]
+    visited = Set.new
+    visited.add(start)
 
     while !queue.empty?
       # require "byebug"; byebug;
@@ -85,7 +86,17 @@ class Day < AOCSolution
       pos = path.last
 
       if pos == goal
+        @shortest_paths[[start, goal]] = path
+        @shortest_paths[[goal, start]] = path
         return path
+      end
+
+      if @shortest_paths.key?([pos, goal])
+        shortest = path.dup.concat(@shortest_paths[[pos, goal]].dup)
+        @shortest_paths[[start, goal]] = shortest
+        @shortest_paths[[goal, start]] = shortest
+
+        return shortest
       end
 
       relevant_children(pos, goal).each do |new_pos|
@@ -102,6 +113,7 @@ class Day < AOCSolution
   end
 
   def pt1
+    @shortest_paths = {}
     cosmos = expand 
     galaxies = find_galaxies(cosmos)
     combinations = galaxies.combination(2).to_a
