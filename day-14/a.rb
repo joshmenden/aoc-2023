@@ -48,13 +48,52 @@ class Day < AOCSolution
     table.each_with_index.reduce(0) { |acc, (row, ind)| acc + (row.count("O") * (table.size - ind)) }
   end
 
-  def pt2
-    table = twod_arr(@data)
+  def cycle(table)
     table = tilt(table, :north)
-        
-    table.each_with_index.reduce(0) do |acc, (row, ind)|
-      acc + (row.count("O") * (table.size - ind))
+    table = tilt(table, :west)
+    table = tilt(table, :south)
+    table = tilt(table, :east)
+
+    table
+  end
+
+  def north_load(table)
+    table.each_with_index.reduce(0) { |acc, (row, ind)| acc + (row.count("O") * (table.size - ind)) }
+  end
+
+  def pt2
+    pattern = {}
+    results = []
+    patt_start = nil
+    patt_end = nil
+
+    table = twod_arr(@data)
+    cycles = 1_000_000_000
+    cycles.times do |cycle|
+      table_key = Digest::SHA256.hexdigest(table.map(&:join).join("***"))
+      table = cycle(table)
+
+      if pattern.key?(table_key)
+        if pattern[table_key].length == 1 && patt_start.nil?
+          patt_start = cycle
+        elsif pattern[table_key].length == 2 && patt_end.nil?
+          patt_end = cycle
+        elsif pattern[table_key].length == 3
+          results << north_load(table)
+          break
+        end
+
+        pattern[table_key] << north_load(table)
+      else
+        pattern[table_key] = [north_load(table)]
+      end
+
+      results << north_load(table)
     end
+
+    pattern_size = patt_end - patt_start
+    index = ((cycles - patt_start) % pattern_size) + patt_start
+    return results[index - 1]
   end
 end
 
