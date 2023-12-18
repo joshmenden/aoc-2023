@@ -67,27 +67,36 @@ class Day < AOCSolution
     }.with_indifferent_access
   end
 
-  def pt1
-    @energized = Set.new
-    @seen = Set.new
-    reflect(0, 0, :right)
-    @energized.count
+  def reflect(row, col, dir, energized = Set.new, seen = Set.new)
+    stack = [[row, col, dir]]
+
+    while stack.any?
+      row, col, dir = stack.pop
+
+      next unless within_bounds?(@data, row, col)
+      next if seen.include?([row, col, dir])
+
+      energized.add([row,col])
+      seen.add([row, col, dir])
+
+      reflection_proc = @reflections[@data[row][col]]
+      reflection_proc.call(dir, row, col).each { |reflection| stack.push(reflection) }
+    end
+
+    energized.count
   end
 
-  def reflect(row, col, dir)
-    return unless within_bounds?(@data, row, col)
-    return if @seen.include?([row, col, dir])
-
-    @energized.add([row,col])
-    @seen.add([row, col, dir])
-
-    reflection_proc = @reflections[@data[row][col]]
-    reflection_proc.call(dir, row, col).each do |(row, col, dir)|
-      reflect(row, col, dir)
-    end
+  def pt1
+    reflect(0, 0, :right)
   end
 
   def pt2
+    [
+      [0].product((0...@data[0].size).to_a).map {|row, col| reflect(row, col, :down) }.max,
+      [@data.size - 1].product((0...@data[0].size).to_a).map {|row, col| reflect(row, col, :up) }.max,
+      (0...@data.size).to_a.product([0]).map {|row, col| reflect(row, col, :right) }.max,
+      (0...@data.size).to_a.product([@data[0].size - 1]).map {|row, col| reflect(row, col, :right) }.max
+    ].max
   end
 end
 
