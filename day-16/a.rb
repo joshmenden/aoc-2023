@@ -95,7 +95,7 @@ class Day < AOCSolution
       [0].product((0...@data[0].size).to_a).map {|row, col| reflect(row, col, :down) }.max,
       [@data.size - 1].product((0...@data[0].size).to_a).map {|row, col| reflect(row, col, :up) }.max,
       (0...@data.size).to_a.product([0]).map {|row, col| reflect(row, col, :right) }.max,
-      (0...@data.size).to_a.product([@data[0].size - 1]).map {|row, col| reflect(row, col, :right) }.max
+      (0...@data.size).to_a.product([@data[0].size - 1]).map {|row, col| reflect(row, col, :left) }.max
     ].max
   end
 end
